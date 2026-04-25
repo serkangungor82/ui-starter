@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "login": "Login",
+    "register": "Get Started",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "auth": {
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "login_title": "Login",
+    "register_title": "Create Account",
+    "login_submit": "Login",
+    "register_submit": "Create Account",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?",
+    "verify_email_title": "Email Verification",
+    "verify_sms_title": "Phone Verification",
+    "verify_desc": "Enter the verification code",
+    "verify_submit": "Verify",
+    "resend": "Resend code",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "confirm_password": "Confirm password",
+    "passwords_no_match": "Passwords do not match",
+    "forgot_password": "Forgot my password",
+    "or_continue_with": "or continue with",
+    "google_login": "Continue with Google",
+    "github_login": "Continue with GitHub",
+    "microsoft_login": "Continue with Microsoft",
+    "google_register": "Continue with Google",
+    "microsoft_register": "Continue with Microsoft",
+    "github_register": "Continue with GitHub"
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "notifications": "Notifications",
+    "account": "My Account"
+  }
+}

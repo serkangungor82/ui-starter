@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "login": "Giriş Yap",
+    "register": "Ücretsiz Başla",
+    "dashboard": "Panel",
+    "logout": "Çıkış"
+  },
+  "auth": {
+    "email": "E-posta",
+    "phone": "Telefon",
+    "password": "Şifre",
+    "login_title": "Giriş Yap",
+    "register_title": "Hesap Oluştur",
+    "login_submit": "Giriş Yap",
+    "register_submit": "Hesap Oluştur",
+    "no_account": "Hesabınız yok mu?",
+    "has_account": "Zaten hesabınız var mı?",
+    "verify_email_title": "E-posta Doğrulama",
+    "verify_sms_title": "Telefon Doğrulama",
+    "verify_desc": "Doğrulama kodunu girin",
+    "verify_submit": "Doğrula",
+    "resend": "Kodu tekrar gönder",
+    "first_name": "Ad",
+    "last_name": "Soyad",
+    "confirm_password": "Şifreyi tekrar girin",
+    "passwords_no_match": "Şifreler eşleşmiyor",
+    "forgot_password": "Şifremi unuttum",
+    "or_continue_with": "veya şununla devam et",
+    "google_login": "Google ile giriş yap",
+    "github_login": "GitHub ile giriş yap",
+    "microsoft_login": "Microsoft ile giriş yap",
+    "google_register": "Google ile devam et",
+    "microsoft_register": "Microsoft ile devam et",
+    "github_register": "GitHub ile devam et"
+  },
+  "dashboard": {
+    "title": "",
+    "notifications": "Bildirimler",
+    "account": "Hesabım"
+  }
+}
