@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { removeToken } from "@/lib/auth";
 import { listNotifications, markRead, markAllRead } from "@/lib/api";
+import NotificationBell from "@/components/patterns/NotificationBell/NotificationBell";
 
 function BellIcon() {
   return (
@@ -100,101 +101,6 @@ function LogoutIcon() {
   );
 }
 
-const typeColors: Record<string, string> = {
-  info: "border-l-blue-400",
-  warning: "border-l-orange-400",
-  danger: "border-l-red-500",
-};
-
-
-function NotificationBell() {
-  const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    listNotifications().then((r) => setNotifications(r.data)).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const unread = notifications.filter((n) => !n.read).length;
-
-  const handleMarkRead = async (id: number) => {
-    await markRead(id);
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  };
-
-  const handleMarkAll = async () => {
-    await markAllRead();
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => {
-          const opening = !open;
-          setOpen(opening);
-          if (opening && unread > 0) handleMarkAll();
-        }}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-      >
-        <BellIcon />
-        {unread > 0 && (
-          <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
-            {unread > 9 ? "9+" : unread}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-gray-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-            <span className="text-sm font-semibold">Bildirimler</span>
-            {unread > 0 && (
-              <button onClick={handleMarkAll} className="text-xs text-indigo-600 hover:underline">
-                Tümünü okundu işaretle
-              </button>
-            )}
-          </div>
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <p className="p-6 text-center text-sm text-gray-400">Bildirim yok</p>
-            ) : (
-              notifications.slice(0, 10).map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => !n.read && handleMarkRead(n.id)}
-                  className={`border-l-4 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${typeColors[n.type] ?? "border-l-gray-200"} ${n.read ? "opacity-60" : ""}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{n.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="text-xs text-gray-400">
-                        {new Date(n.created_at).toLocaleDateString("tr-TR")}
-                      </span>
-                      {!n.read && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { locale } = useParams<{ locale: string }>();
@@ -273,7 +179,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Yönetim Paneli
             </Link>
           )}
-          <NotificationBell />
+          <NotificationBell
+            fetcher={() => listNotifications().then((r) => r.data)}
+            markRead={markRead}
+            markAllRead={markAllRead}
+          />
         </header>
 
         {/* Content */}

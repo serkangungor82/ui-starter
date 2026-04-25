@@ -1,81 +1,81 @@
-# UI Starter
+# UI Starter — Full-Stack
 
-Next.js + Tailwind temelli, ortak ihtiyaçlar (auth akışı, dashboard layout, admin panel, i18n, modern UI bileşenleri) için hazır iskelet.
-
-Bu repo MaxiContext projesinden iş mantığı temizlenip yeniden kullanılabilir bir "starter" olarak çıkartıldı.
+Next.js (frontend) + FastAPI (backend) ortak bir iskelet. Yeni projelere hızlı başlangıç sağlar.
 
 ## İçerik
 
-- **Auth UI**: login, register, forgot/reset password, e-posta/SMS verify, OAuth callback (Google, Microsoft, GitHub butonları hazır)
-- **Dashboard layout**: sidebar + header + bildirim çanı
-- **Admin layout**: ayrı bir admin paneli iskeleti
-- **i18n**: TR/EN, `next-intl` ile
-- **UI**: Tailwind theme, gradient/animasyon utility'leri (`gradient-x`, `float`, `marquee`, `ai-dots`, `ai-shimmer`)
-- **Axios + Bearer token**: `lib/api.ts`, `lib/auth.ts`
-- **TypeScript** strict mode
+- **Frontend** (`frontend/`)
+  - Next.js 16 + Tailwind + i18n (TR/EN)
+  - Auth UI: login, register, forgot/reset, verify, OAuth callback
+  - Dashboard + admin layout (sidebar, bildirim çanı)
+  - **Pattern komponentleri** (`components/patterns/`): NotificationBell, KvkkModal — copy-paste edilebilir, kendi sözleşmesi olan opsiyonel parçalar
+  - **Storybook** ile component katalog
+- **Backend** (`backend/`)
+  - FastAPI + SQLAlchemy + JWT
+  - SQLite varsayılan (Postgres'e geçiş tek satır)
+  - Auth endpoint'leri: register / login / me / verify / forgot / reset
+  - Bildirim stub'ı
 
-## Kurulum
+## Hızlı başlangıç
+
+İki terminal açıp ikisini de çalıştır:
 
 ```bash
-npm install        # veya pnpm install
-cp .env.local.example .env.local
-# .env.local içine NEXT_PUBLIC_API_URL'i kendi backend adresinle güncelle
-npm run dev
+# Backend
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn main:app --reload   # http://localhost:8000
 ```
 
-`http://localhost:3000` üzerinde açılır. Türkçe için `/tr`, İngilizce için `/en`.
+```bash
+# Frontend
+cd frontend
+npm install
+cp .env.local.example .env.local   # NEXT_PUBLIC_API_URL=http://localhost:8000
+npm run dev                         # http://localhost:3000
+```
+
+Türkçe için `/tr`, İngilizce için `/en`.
+
+## Storybook
+
+```bash
+cd frontend
+npm run storybook   # http://localhost:6006
+```
+
+## Docker (lokal full stack)
+
+```bash
+docker compose up --build
+```
+
+Frontend `:3000`, backend `:8000` üzerinde açılır.
 
 ## Yapı
 
 ```
-app/
-  globals.css                  # Tailwind + custom animasyonlar
-  [locale]/
-    layout.tsx                 # i18n provider, html/body kabuğu
-    page.tsx                   # Landing
-    auth/                      # login, register, forgot, reset, verify, callback
-    dashboard/
-      layout.tsx               # Sidebar + bildirim çanı
-      page.tsx                 # Karşılama
-      account/, settings/, notifications/
-    admin/
-      layout.tsx               # Admin sidebar
-      page.tsx, settings/
-components/
-  layout/Navbar.tsx
-i18n/                          # next-intl konfig
-lib/
-  api.ts                       # axios + auth endpoint sözleşmeleri
-  auth.ts                      # token storage
-messages/
-  tr.json, en.json
-middleware.ts                  # locale yönlendirme
-tailwind.config.js
+ui-starter/
+├── frontend/                    # Next.js app
+│   ├── app/[locale]/            # auth, dashboard, admin
+│   ├── components/
+│   │   ├── patterns/            # NotificationBell, KvkkModal (opsiyonel)
+│   │   └── layout/              # Navbar
+│   ├── lib/api.ts               # axios + auth endpoint sözleşmeleri
+│   ├── messages/                # tr.json, en.json
+│   ├── .storybook/              # Storybook config
+│   └── ...
+├── backend/                     # FastAPI app
+│   ├── main.py
+│   ├── config.py, database.py
+│   ├── models/                  # User, VerificationCode
+│   ├── routers/                 # auth, notifications
+│   └── services/security.py     # JWT + password hashing
+└── docker-compose.yml
 ```
-
-## Backend bağlama
-
-Frontend backend agnostic — `lib/api.ts` içindeki endpoint'ler şu sözleşmeyi bekler:
-
-| Endpoint | Beklenen yanıt |
-|---|---|
-| `POST /auth/register` | `201` |
-| `POST /auth/login` | `{ access_token: string }` |
-| `POST /auth/forgot-password` | `200` |
-| `POST /auth/reset-password` | `200` |
-| `POST /auth/verify` | `200` |
-| `GET /auth/me` | `{ id, email, first_name, last_name, phone, email_verified, phone_verified, is_admin, ... }` |
-| `GET /auth/me/logins` | `[{ ip, user_agent, created_at }]` |
-| `GET /notifications/` | `[{ id, title, message, type, read, created_at }]` |
-| `POST /notifications/{id}/read` | `200` |
-| `POST /notifications/read-all` | `200` |
-
-OAuth için login/register sayfasındaki butonlar `${API_BASE}/auth/google`, `/auth/microsoft`, `/auth/github` adreslerine yönlendirir — backend'de bu redirect endpoint'lerini açman gerekir.
-
-## Temalama
-
-Renk paleti `tailwind.config.js`'de. Birincil renkler: `indigo` ve `violet`. Animasyonlar `app/globals.css` içinde.
 
 ## Lisans
 
-İç kullanım için. Dilediğin gibi düzenleyebilirsin.
+İç kullanım için. Yeni projelere göre özgürce uyarla.
