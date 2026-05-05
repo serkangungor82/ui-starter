@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getToken, removeToken } from "@/lib/auth";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function Navbar() {
   const t = useTranslations("nav");
@@ -32,6 +33,7 @@ export default function Navbar() {
           UI Starter
         </Link>
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <Link href={`/${otherLocale}`} className="flex items-center gap-1 text-sm text-white/50 hover:text-white/80 transition-colors">
             <span>{flags[otherLocale]}</span>
             <span>{labels[otherLocale]}</span>
