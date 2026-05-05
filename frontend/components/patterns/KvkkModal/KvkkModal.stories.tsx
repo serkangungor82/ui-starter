@@ -30,6 +30,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    open: true,
+    onOpenChange: () => {},
     phone: "+90 555 123 45 67",
     aydinlatmaMetni: SAMPLE_AYDINLATMA,
     onSendSms: async () => {
