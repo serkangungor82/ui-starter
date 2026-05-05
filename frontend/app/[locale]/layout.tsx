@@ -3,6 +3,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { LocaleSync } from "@/components/locale-sync";
 import CommandPalette from "@/components/patterns/CommandPalette/CommandPalette";
+import NavbarSlot from "@/components/layout/NavbarSlot";
 
 export default async function LocaleLayout({
   children,
@@ -19,6 +20,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <LocaleSync />
       <CommandPalette />
+      <NavbarSlot />
       {children}
     </NextIntlClientProvider>
   );

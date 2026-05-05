@@ -20,7 +20,7 @@ export default function DashboardHome() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600 dark:border-indigo-500/30 dark:border-t-indigo-400" />
       </div>
     );
   }
@@ -34,16 +34,16 @@ export default function DashboardHome() {
   return (
     <div className="flex-1 overflow-y-auto space-y-5">
       {/* Hoşgeldin kartı */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-base font-black text-white shadow-sm">
             {((user.first_name?.[0] ?? "") + (user.last_name?.[0] ?? "")).toUpperCase() || user.email[0].toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-base font-bold text-gray-900">
+            <p className="text-base font-bold text-foreground">
               {isTr ? "Hoşgeldin" : "Welcome"}, {fullName}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               {isTr
                 ? "UI Starter ile sıfırdan modern bir Next.js iskeletine sahipsin."
                 : "You're up and running with a modern Next.js skeleton."}
@@ -59,10 +59,10 @@ export default function DashboardHome() {
           { title: isTr ? "İstatistik #2" : "Stat #2", value: "—" },
           { title: isTr ? "İstatistik #3" : "Stat #3", value: "—" },
         ].map((s, i) => (
-          <div key={i} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{s.title}</p>
-            <p className="mt-2 text-2xl font-bold text-gray-900">{s.value}</p>
-            <p className="mt-1 text-xs text-gray-400">
+          <div key={i} className="rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-sm">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{s.title}</p>
+            <p className="mt-2 text-2xl font-bold text-foreground">{s.value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               {isTr ? "Buraya kendi metriğini ekleyebilirsin." : "Plug in your own metric here."}
             </p>
           </div>
@@ -70,11 +70,11 @@ export default function DashboardHome() {
       </div>
 
       {/* Yer tutucu içerik bloku */}
-      <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
-        <p className="text-sm font-semibold text-gray-700">
+      <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-10 text-center">
+        <p className="text-sm font-semibold text-foreground">
           {isTr ? "Buraya kendi içeriğini ekle" : "Add your own content here"}
         </p>
-        <p className="mt-1 text-xs text-gray-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {isTr
             ? "Bu sayfa yeni proje şablonu için boş bir karşılama ekranıdır."
             : "This is a placeholder landing for your dashboard."}

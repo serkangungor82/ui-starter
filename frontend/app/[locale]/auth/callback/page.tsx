@@ -27,10 +27,10 @@ export default function OAuthCallbackPage() {
   }, [locale, router, searchParams]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex flex-1 items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-        <p className="text-sm text-gray-500">Giriş yapılıyor...</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent dark:border-indigo-400 dark:border-t-transparent" />
+        <p className="text-sm text-muted-foreground">Giriş yapılıyor...</p>
       </div>
     </div>
   );

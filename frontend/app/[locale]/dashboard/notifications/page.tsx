@@ -29,7 +29,7 @@ export default function NotificationsPage() {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  if (loading) return <div className="text-gray-400">Yükleniyor...</div>;
+  if (loading) return <div className="text-muted-foreground">Yükleniyor...</div>;
 
   const unread = notifications.filter((n) => !n.read);
 
@@ -38,14 +38,17 @@ export default function NotificationsPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("notifications")}</h1>
         {unread.length > 0 && (
-          <button onClick={handleMarkAllRead} className="text-sm text-indigo-600 hover:underline">
+          <button
+            onClick={handleMarkAllRead}
+            className="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
+          >
             Tümünü okundu işaretle
           </button>
         )}
       </div>
 
       {notifications.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-12 text-center text-gray-400">
+        <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
           Bildirim yok
         </div>
       ) : (
@@ -54,18 +57,18 @@ export default function NotificationsPage() {
             <div
               key={n.id}
               onClick={() => !n.read && handleMarkRead(n.id)}
-              className={`rounded-xl border-l-4 bg-white p-4 shadow-sm cursor-pointer transition-opacity ${typeColors[n.type]} ${n.read ? "opacity-60" : ""}`}
+              className={`rounded-xl border-l-4 border border-border bg-card p-4 text-card-foreground shadow-sm cursor-pointer transition-opacity ${typeColors[n.type]} ${n.read ? "opacity-60" : ""}`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-sm">{n.title}</p>
-                  <p className="text-sm text-gray-500 mt-1">{n.message}</p>
+                  <p className="font-medium text-sm text-foreground">{n.title}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{n.message}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(n.created_at).toLocaleDateString("tr-TR")}
                   </span>
-                  {!n.read && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+                  {!n.read && <span className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />}
                 </div>
               </div>
             </div>

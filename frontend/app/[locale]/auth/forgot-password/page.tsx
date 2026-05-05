@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { forgotPassword } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ForgotPasswordPage() {
   const { locale } = useParams<{ locale: string }>();
@@ -29,22 +31,25 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+      <div className="flex flex-1 items-center justify-center bg-background px-4 py-10">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-sm text-center">
           <div className="mb-4 text-4xl">📧</div>
           <h1 className="mb-2 text-xl font-bold">E-posta Gönderildi</h1>
-          <p className="mb-6 text-sm text-gray-500">
-            <strong>{email}</strong> adresine şifre sıfırlama kodu gönderdik. Gelen kutunuzu kontrol edin.
+          <p className="mb-6 text-sm text-muted-foreground">
+            <strong className="text-foreground">{email}</strong> adresine şifre sıfırlama kodu gönderdik. Gelen kutunuzu kontrol edin.
           </p>
-          <button
+          <Button
             onClick={() => router.push(`/${locale}/auth/reset-password?email=${encodeURIComponent(email)}`)}
-            className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-medium text-white hover:bg-indigo-700"
+            className="w-full h-11 bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400"
           >
             Kodu Girdim, Devam Et
-          </button>
-          <p className="mt-4 text-xs text-gray-400">
+          </Button>
+          <p className="mt-4 text-xs text-muted-foreground">
             Kod gelmedi mi?{" "}
-            <button onClick={() => { setSent(false); }} className="text-indigo-600 hover:underline">
+            <button
+              onClick={() => setSent(false)}
+              className="text-indigo-600 hover:underline dark:text-indigo-400"
+            >
               Tekrar gönder
             </button>
           </p>
@@ -54,35 +59,38 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex flex-1 items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-sm">
           <h1 className="mb-2 text-2xl font-bold">Şifremi Unuttum</h1>
-          <p className="mb-6 text-sm text-gray-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             Kayıtlı e-posta adresinizi girin, size sıfırlama kodu gönderelim.
           </p>
 
           <form onSubmit={submit} className="flex flex-col gap-4">
-            <input
+            <Input
               type="email"
               placeholder="E-posta adresiniz"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none"
+              className="h-11 px-4 text-sm"
               required
             />
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <button
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-indigo-600 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="h-11 bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400"
             >
               {loading ? "Gönderiliyor..." : "Kod Gönder"}
-            </button>
+            </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-500">
-            <Link href={`/${locale}/auth/login`} className="text-indigo-600 hover:underline">
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            <Link
+              href={`/${locale}/auth/login`}
+              className="text-indigo-600 hover:underline dark:text-indigo-400"
+            >
               ← Giriş sayfasına dön
             </Link>
           </p>
