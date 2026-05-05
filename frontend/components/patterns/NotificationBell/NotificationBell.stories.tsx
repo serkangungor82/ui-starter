@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import NotificationBell, { Notification } from "./NotificationBell";
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import NotificationBell, { type Notification } from "./NotificationBell";
 
 const sampleNotifications: Notification[] = [
   {
@@ -28,15 +28,15 @@ const sampleNotifications: Notification[] = [
   },
 ];
 
-const meta = {
+const meta: Meta<typeof NotificationBell> = {
   title: "Patterns/NotificationBell",
   component: NotificationBell,
   parameters: { layout: "padded" },
   tags: ["autodocs"],
-} satisfies Meta<typeof NotificationBell>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof NotificationBell>;
 
 export const Default: Story = {
   args: {

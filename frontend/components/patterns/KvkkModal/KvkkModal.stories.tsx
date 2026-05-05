@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import KvkkModal from "./KvkkModal";
 
 const SAMPLE_AYDINLATMA = `Şirketinizin İsmi ("Veri Sorumlusu") olarak 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (KVKK) 10. maddesi kapsamında kişisel verilerinizin işlenmesine ilişkin sizi bilgilendirmek isteriz.
@@ -18,18 +18,20 @@ VERİ SAKLAMA SÜRESİ
 HAKLARINIZ
 KVKK'nın 11. maddesi uyarınca; verilerinize erişim, düzeltilmesini ve silinmesini talep etme, işlemenin kısıtlanmasını isteme ve itiraz etme haklarına sahipsiniz.`;
 
-const meta = {
+const meta: Meta<typeof KvkkModal> = {
   title: "Patterns/KvkkModal",
   component: KvkkModal,
   parameters: { layout: "fullscreen" },
   tags: ["autodocs"],
-} satisfies Meta<typeof KvkkModal>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof KvkkModal>;
 
 export const Default: Story = {
   args: {
+    open: true,
+    onOpenChange: () => {},
     phone: "+90 555 123 45 67",
     aydinlatmaMetni: SAMPLE_AYDINLATMA,
     onSendSms: async () => {

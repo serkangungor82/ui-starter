@@ -1,4 +1,5 @@
-import type { Preview } from "@storybook/react";
+import type { Preview } from "@storybook/nextjs";
+import { withThemeByClassName } from "@storybook/addon-themes";
 import "../app/globals.css";
 
 const preview: Preview = {
@@ -9,16 +10,15 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    backgrounds: {
-      default: "light",
-      values: [
-        { name: "light", value: "#ffffff" },
-        { name: "gray", value: "#f9fafb" },
-        { name: "dark", value: "#0a0f1e" },
-      ],
-    },
     layout: "centered",
+    backgrounds: { disable: true },
   },
+  decorators: [
+    withThemeByClassName({
+      themes: { light: "", dark: "dark" },
+      defaultTheme: "light",
+    }),
+  ],
 };
 
 export default preview;
