@@ -156,7 +156,17 @@ function ProductsListInner() {
 
       {/* Table */}
       <div className="flex-1 overflow-auto glass-card">
-        <table className="min-w-full text-sm">
+        <table className="w-full table-fixed text-sm">
+          {/* Sabit sütun genişlikleri — submenü filtre değişikliğinde sütunlar yerinden oynamaz */}
+          <colgroup>
+            <col className="w-24" />
+            <col />
+            <col className="w-40" />
+            <col className="w-32" />
+            <col className="w-28" />
+            <col className="w-24" />
+            <col className="w-44" />
+          </colgroup>
           <thead className="sticky top-0 border-b border-border bg-muted/50 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur">
             <tr>
               <th className="px-4 py-3 text-left">{isTr ? "Tip" : "Type"}</th>
