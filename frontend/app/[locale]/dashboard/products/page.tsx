@@ -23,6 +23,10 @@ const TYPE_TONE: Record<ProductType, string> = {
   service: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
 };
 
+// Rozetler için sabit genişlik — kısa/uzun metinde hücre yer değişimi olmasın
+const BADGE_BASE =
+  "inline-flex min-w-[64px] justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold";
+
 
 export default function ProductsListPage() {
   return (
@@ -182,7 +186,7 @@ function ProductsListInner() {
             {filtered.map((p) => (
               <tr key={p.id} className="hover:bg-muted/30">
                 <td className="px-4 py-3">
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${TYPE_TONE[p.type]}`}>
+                  <span className={`${BADGE_BASE} ${TYPE_TONE[p.type]}`}>
                     {TYPE_LABEL[p.type][isTr ? "tr" : "en"]}
                   </span>
                 </td>
@@ -227,11 +231,11 @@ function ProductsListInner() {
                 </td>
                 <td className="px-4 py-3">
                   {p.is_active ? (
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                    <span className={`${BADGE_BASE} bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300`}>
                       {isTr ? "Aktif" : "Active"}
                     </span>
                   ) : (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
+                    <span className={`${BADGE_BASE} bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300`}>
                       {isTr ? "Pasif" : "Inactive"}
                     </span>
                   )}
