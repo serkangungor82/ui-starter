@@ -184,12 +184,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <UserCard me={me} />
       </aside>
 
-      {/* Sub-sidebar — Ürünler ve Hizmetler altındaki ikincil ikon paneli */}
-      {pathname?.startsWith(`/${locale}/dashboard/products`) && (
-        <Suspense fallback={null}>
-          <ProductsSubSidebar locale={locale} pathname={pathname} />
-        </Suspense>
-      )}
+      {/* Sub-sidebar — pathname'a göre menünün submenu'sü açılır.
+          Her ana menü için ayrı submenu listesi (SUBMENUS map). */}
+      <Suspense fallback={null}>
+        <DynamicSubSidebar locale={locale} pathname={pathname ?? ""} />
+      </Suspense>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center justify-end gap-3 border-b border-border bg-card px-6">
@@ -227,59 +226,175 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 }
 
+// ── Submenu icons (lucide-style) ───────────────────────────────
+
+const SubIcons = {
+  list: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>,
+  box: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>,
+  tool: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>,
+  user: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>,
+  building: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" /></svg>,
+  trendUp: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
+  star: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
+  draft: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>,
+  send: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>,
+  check: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>,
+  x: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>,
+  clock: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>,
+  alert: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
+  refresh: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>,
+  calendar: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
+  bell: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>,
+  chartPie: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83" /><path d="M22 12A10 10 0 0 0 12 2v10z" /></svg>,
+  chartBar: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" /></svg>,
+  wallet: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" /></svg>,
+  api: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>,
+  hook: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
+  mail: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>,
+  phone: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>,
+  puzzle: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.5 2.5 0 1 0-3.214 3.214c.446.166.855.498.925.968a.99.99 0 0 1-.276.837l-1.61 1.61a2.41 2.41 0 0 1-3.41 0l-1.568-1.568a1 1 0 0 0-.878-.29c-.493.074-.84.504-1.012.972a2.5 2.5 0 1 1-3.237-3.237c.469-.172.898-.52.972-1.012a1 1 0 0 0-.29-.878l-1.567-1.568A2.41 2.41 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77a1 1 0 0 1 .835-.275c.493.074.84.504 1.012.972a2.5 2.5 0 1 0 3.237-3.237c-.469-.172-.898-.52-.972-1.012a1 1 0 0 1 .275-.835l1.611-1.611a2.41 2.41 0 0 1 3.41 0l1.568 1.568c.23.23.556.338.878.29.493-.074.84-.504 1.012-.972a2.5 2.5 0 1 1 3.237 3.237c-.469.172-.898.52-.972 1.012Z" /></svg>,
+  shield: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+  palette: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>,
+  database: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14a9 3 0 0 0 18 0V5" /><path d="M3 12a9 3 0 0 0 18 0" /></svg>,
+  info: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>,
+} as const;
+
+type SubItem = { key: string; tr: string; en: string; icon: React.ReactNode };
+
 /**
- * /dashboard/products altında ana sidebar'ın yanında açılan dar (w-16)
- * ikon panel. Tab tıklandığında ?type=... query parametresiyle ana
- * liste sayfasını filtreler. Yeni/Düzenleme sayfalarındayken aktif
- * sekme görünür kalır.
+ * Her ana menü için submenü item'ları. `key` URL'de ?sub=key olarak görünür.
+ * Submenü'sü olmayan menüler (Kontrol Paneli) buraya konmaz.
  */
-function ProductsSubSidebar({ locale, pathname }: { locale: string; pathname: string }) {
+const SUBMENUS: Record<string, SubItem[]> = {
+  products: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "products", tr: "Ürünler", en: "Products", icon: SubIcons.box },
+    { key: "services", tr: "Hizmetler", en: "Services", icon: SubIcons.tool },
+  ],
+  customers: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "individuals", tr: "Bireysel", en: "Individuals", icon: SubIcons.user },
+    { key: "corporate", tr: "Kurumsal", en: "Corporate", icon: SubIcons.building },
+    { key: "leads", tr: "Potansiyeller", en: "Leads", icon: SubIcons.trendUp },
+    { key: "favorites", tr: "Favoriler", en: "Favorites", icon: SubIcons.star },
+  ],
+  quotes: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "draft", tr: "Taslak", en: "Draft", icon: SubIcons.draft },
+    { key: "sent", tr: "Gönderilen", en: "Sent", icon: SubIcons.send },
+    { key: "accepted", tr: "Kabul", en: "Accepted", icon: SubIcons.check },
+    { key: "rejected", tr: "Reddedilen", en: "Rejected", icon: SubIcons.x },
+    { key: "expired", tr: "Süresi Dolmuş", en: "Expired", icon: SubIcons.clock },
+  ],
+  contracts: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "active", tr: "Aktif", en: "Active", icon: SubIcons.check },
+    { key: "expiring", tr: "Süresi Doluyor", en: "Expiring", icon: SubIcons.alert },
+    { key: "expired", tr: "Süresi Dolmuş", en: "Expired", icon: SubIcons.clock },
+    { key: "renewed", tr: "Yenilenen", en: "Renewed", icon: SubIcons.refresh },
+  ],
+  tickets: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "open", tr: "Açık", en: "Open", icon: SubIcons.alert },
+    { key: "pending", tr: "Bekleyen", en: "Pending", icon: SubIcons.clock },
+    { key: "resolved", tr: "Çözümlenen", en: "Resolved", icon: SubIcons.check },
+    { key: "closed", tr: "Kapalı", en: "Closed", icon: SubIcons.x },
+  ],
+  tasks: [
+    { key: "all", tr: "Tümü", en: "All", icon: SubIcons.list },
+    { key: "mine", tr: "Bana Atanan", en: "Assigned to me", icon: SubIcons.user },
+    { key: "today", tr: "Bugün", en: "Today", icon: SubIcons.calendar },
+    { key: "overdue", tr: "Geciken", en: "Overdue", icon: SubIcons.alert },
+    { key: "done", tr: "Tamamlanan", en: "Done", icon: SubIcons.check },
+  ],
+  reports: [
+    { key: "sales", tr: "Satış", en: "Sales", icon: SubIcons.chartBar },
+    { key: "customers", tr: "Müşteri", en: "Customers", icon: SubIcons.user },
+    { key: "performance", tr: "Performans", en: "Performance", icon: SubIcons.trendUp },
+    { key: "financial", tr: "Finansal", en: "Financial", icon: SubIcons.wallet },
+    { key: "custom", tr: "Özel", en: "Custom", icon: SubIcons.chartPie },
+  ],
+  integrations: [
+    { key: "api", tr: "API", en: "API", icon: SubIcons.api },
+    { key: "webhooks", tr: "Webhook", en: "Webhook", icon: SubIcons.hook },
+    { key: "email", tr: "E-posta", en: "Email", icon: SubIcons.mail },
+    { key: "sms", tr: "SMS", en: "SMS", icon: SubIcons.phone },
+    { key: "addons", tr: "Eklentiler", en: "Add-ons", icon: SubIcons.puzzle },
+  ],
+  account: [
+    { key: "profile", tr: "Profil", en: "Profile", icon: SubIcons.user },
+    { key: "security", tr: "Güvenlik", en: "Security", icon: SubIcons.shield },
+    { key: "notifications", tr: "Bildirimler", en: "Notifications", icon: SubIcons.bell },
+    { key: "activity", tr: "Aktivite Geçmişi", en: "Activity", icon: SubIcons.clock },
+  ],
+  settings: [
+    { key: "general", tr: "Genel", en: "General", icon: SubIcons.info },
+    { key: "appearance", tr: "Görünüm", en: "Appearance", icon: SubIcons.palette },
+    { key: "company", tr: "Şirket", en: "Company", icon: SubIcons.building },
+    { key: "notifications", tr: "Bildirimler", en: "Notifications", icon: SubIcons.bell },
+    { key: "data", tr: "Veriler", en: "Data", icon: SubIcons.database },
+    { key: "about", tr: "Hakkında", en: "About", icon: SubIcons.info },
+  ],
+};
+
+
+/**
+ * Pathname'a göre uygun submenü'yü gösterir. Path eşleşmediği menü için
+ * (örn /dashboard) hiçbir submenu gösterilmez. Submenü item'ları
+ * ?sub=<key> query parametresi ile linklenir; sayfa içinde bu param
+ * okunup içerik filtrelenebilir.
+ */
+function DynamicSubSidebar({ locale, pathname }: { locale: string; pathname: string }) {
   const searchParams = useSearchParams();
   const isTr = locale === "tr";
-  const onListPage = pathname === `/${locale}/dashboard/products`;
-  const activeType = onListPage ? searchParams.get("type") : null;
 
-  const ListIcon = (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
-      <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
-    </svg>
-  );
-  const BoxIcon = (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-      <line x1="12" y1="22.08" x2="12" y2="12" />
-    </svg>
-  );
-  const ToolIcon = (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-    </svg>
-  );
+  // Pathname'dan menü segment'ini çek: /tr/dashboard/<segment>/...
+  const dashPrefix = `/${locale}/dashboard`;
+  if (!pathname.startsWith(dashPrefix)) return null;
+  const rest = pathname.slice(dashPrefix.length).replace(/^\//, "");
+  const segment = rest.split("/")[0];
 
-  const items: { key: string; tr: string; en: string; icon: React.ReactNode; href: string; matchType: string | null }[] = [
-    { key: "all", tr: "Tümü", en: "All", icon: ListIcon, href: `/${locale}/dashboard/products`, matchType: null },
-    { key: "products", tr: "Ürünler", en: "Products", icon: BoxIcon, href: `/${locale}/dashboard/products?type=product`, matchType: "product" },
-    { key: "services", tr: "Hizmetler", en: "Services", icon: ToolIcon, href: `/${locale}/dashboard/products?type=service`, matchType: "service" },
-  ];
+  const items = SUBMENUS[segment];
+  if (!items) return null;
+
+  // Products için özel uyumluluk: ?type= → ?sub= mapping
+  // (mevcut /dashboard/products?type=product linkleriyle geriye dönük uyumlu)
+  const queryType = searchParams.get("type");
+  const querySub = searchParams.get("sub");
+  let activeKey: string | null = querySub;
+  if (segment === "products" && !querySub) {
+    if (queryType === "product") activeKey = "products";
+    else if (queryType === "service") activeKey = "services";
+    else activeKey = "all";
+  }
+  // Diğer menülerde sub yoksa ilk item ("Tümü") implicit aktif sayılır
+  if (!activeKey && items[0]?.key === "all") activeKey = "all";
 
   return (
     <aside className="relative hidden w-16 shrink-0 flex-col items-center bg-gradient-to-b from-indigo-950 via-violet-950 to-purple-950 shadow-[inset_1px_0_0_rgba(255,255,255,0.04),inset_-1px_0_0_rgba(0,0,0,0.4)] md:flex">
-      {/* Glass top highlight */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/8" />
-      {/* Subtle backdrop noise — daha derin glass hissi için */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
       <div className="relative h-14 w-full shrink-0" />
       <nav className="relative w-full flex-1 p-3">
         <div className="flex flex-col items-center gap-1">
           {items.map((it) => {
             const label = isTr ? it.tr : it.en;
-            const active = onListPage ? activeType === it.matchType : false;
+            const active = activeKey === it.key;
+            // Products için ?type= URL'i koru (geriye dönük), diğerleri ?sub=
+            let href: string;
+            if (segment === "products") {
+              if (it.key === "all") href = `${dashPrefix}/products`;
+              else if (it.key === "products") href = `${dashPrefix}/products?type=product`;
+              else href = `${dashPrefix}/products?type=service`;
+            } else {
+              href = it.key === "all"
+                ? `${dashPrefix}/${segment}`
+                : `${dashPrefix}/${segment}?sub=${it.key}`;
+            }
             return (
               <Link
                 key={it.key}
-                href={it.href}
+                href={href}
                 aria-label={label}
                 title={label}
                 className={`group relative flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
