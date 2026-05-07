@@ -1,101 +1,113 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { forgotPassword } from "@/lib/api";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
-export default function ForgotPasswordPage() {
+import { forgotPassword } from "@/lib/api";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { labelClass, submitBtnClass } from "@/components/auth/styles";
+
+
+function ForgotForm() {
+  const t = useTranslations("auth");
   const { locale } = useParams<{ locale: string }>();
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState<string | undefined>();
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
+
+  const defaultCountry = locale === "en" ? "US" : "TR";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!phone || !isValidPhoneNumber(phone)) {
+      setError(locale === "tr" ? "Geçerli bir GSM numarası girin" : "Enter a valid phone number");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      await forgotPassword(email);
+      await forgotPassword(phone);
       setSent(true);
-    } catch {
-      setError("Bir hata oluştu. Lütfen tekrar deneyin.");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || (locale === "tr" ? "Hata oluştu" : "An error occurred"));
     } finally {
       setLoading(false);
     }
   };
 
-  if (sent) {
+  if (sent && phone) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-background px-4 py-10">
-        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-sm text-center">
-          <div className="mb-4 text-4xl">📧</div>
-          <h1 className="mb-2 text-xl font-bold">E-posta Gönderildi</h1>
-          <p className="mb-6 text-sm text-muted-foreground">
-            <strong className="text-foreground">{email}</strong> adresine şifre sıfırlama kodu gönderdik. Gelen kutunuzu kontrol edin.
-          </p>
-          <Button
-            onClick={() => router.push(`/${locale}/auth/reset-password?email=${encodeURIComponent(email)}`)}
-            className="w-full h-11 bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400"
-          >
-            Kodu Girdim, Devam Et
-          </Button>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Kod gelmedi mi?{" "}
-            <button
-              onClick={() => setSent(false)}
-              className="text-indigo-600 hover:underline dark:text-indigo-400"
-            >
-              Tekrar gönder
-            </button>
-          </p>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("forgot_sent_title")}</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("forgot_sent_desc")}</p>
         </div>
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300">
+          ✓ <span className="font-mono">{phone}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() =>
+            router.push(`/${locale}/auth/reset-password?phone=${encodeURIComponent(phone)}`)
+          }
+          className={submitBtnClass}
+        >
+          {t("forgot_sent_continue")}
+        </button>
+        <Link
+          href={`/${locale}/auth/login`}
+          className="text-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          ← {t("back_to_login")}
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-sm">
-        <div className="rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-sm">
-          <h1 className="mb-2 text-2xl font-bold">Şifremi Unuttum</h1>
-          <p className="mb-6 text-sm text-muted-foreground">
-            Kayıtlı e-posta adresinizi girin, size sıfırlama kodu gönderelim.
-          </p>
-
-          <form onSubmit={submit} className="flex flex-col gap-4">
-            <Input
-              type="email"
-              placeholder="E-posta adresiniz"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-11 px-4 text-sm"
-              required
-            />
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="h-11 bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400"
-            >
-              {loading ? "Gönderiliyor..." : "Kod Gönder"}
-            </Button>
-          </form>
-
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            <Link
-              href={`/${locale}/auth/login`}
-              className="text-indigo-600 hover:underline dark:text-indigo-400"
-            >
-              ← Giriş sayfasına dön
-            </Link>
-          </p>
-        </div>
+    <form onSubmit={submit} className="flex flex-col gap-4">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("forgot_title")}</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("forgot_desc")}</p>
       </div>
-    </div>
+
+      <div>
+        <label className={labelClass}>{t("phone")}</label>
+        <PhoneInput
+          international
+          defaultCountry={defaultCountry as any}
+          value={phone}
+          onChange={setPhone}
+          className="phone-input"
+        />
+      </div>
+
+      {error && <p className="text-sm text-red-500">{error}</p>}
+
+      <button type="submit" disabled={loading} className={submitBtnClass}>
+        {loading ? "..." : t("forgot_submit")}
+      </button>
+
+      <Link
+        href={`/${locale}/auth/login`}
+        className="text-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+      >
+        ← {t("back_to_login")}
+      </Link>
+    </form>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <AuthLayout hideHomeLink>
+      <ForgotForm />
+    </AuthLayout>
   );
 }

@@ -13,6 +13,16 @@ class Settings(BaseSettings):
     # CORS — virgülle ayrılmış kaynaklar
     CORS_ORIGINS: str = "http://localhost:3000"
 
+    # Microsoft OAuth (kurumsal hesap girişi)
+    # Boş ise endpoint /auth/login?error=microsoft_not_configured'a yönlendirir.
+    # Azure App Registration: Authority = https://login.microsoftonline.com/organizations
+    # (sadece organizational/work hesapları, kişisel reddedilir).
+    MS_CLIENT_ID: str = ""
+    MS_CLIENT_SECRET: str = ""
+    # Backend OAuth callback URL — Azure'da Redirect URI olarak register edilmeli.
+    # Örn: http://api.localhost:8000/auth/microsoft/callback
+    MS_REDIRECT_URI: str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"
