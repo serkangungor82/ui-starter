@@ -116,16 +116,16 @@
 }
 
 .phone-input {
-  @apply flex items-stretch rounded-lg border border-input bg-background overflow-hidden focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30;
+  @apply flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 dark:border-gray-700 dark:bg-gray-800 dark:focus-within:ring-indigo-900;
 }
 .phone-input .PhoneInputCountry {
-  @apply flex items-center px-3 border-r border-input bg-muted;
+  @apply flex items-center px-3 border-r border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-700/40;
 }
 .phone-input .PhoneInputCountrySelect {
   @apply bg-transparent text-sm focus:outline-none;
 }
 .phone-input .PhoneInputInput {
-  @apply flex-1 px-4 py-3 text-sm focus:outline-none bg-transparent;
+  @apply flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none bg-transparent dark:text-gray-100;
 }
 
 @layer base {

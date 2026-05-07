@@ -1,6 +1,24 @@
 import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+/**
+ * API base URL — browser'da çalışırken tarayıcının host'undan türetilir
+ * (demo.localhost:3000 → demo.localhost:8000). Bu sayede backend Host
+ * header'ından subdomain'i (= tenant) çıkarabilir. SSR / build'de
+ * NEXT_PUBLIC_API_URL fallback olarak kullanılır.
+ *
+ * Production'da farklı host şeması kurulduğunda (örn API_HOST env'i)
+ * burası override edilebilir; şimdilik lokal-first.
+ */
+function resolveApiBase(): string {
+  if (typeof window !== "undefined") {
+    const { protocol, hostname } = window.location;
+    const port = process.env.NEXT_PUBLIC_API_PORT || "8000";
+    return `${protocol}//${hostname}:${port}`;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+}
+
+export const API_BASE = resolveApiBase();
 
 export const api = axios.create({ baseURL: API_BASE });
 
@@ -12,21 +30,31 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Auth ────────────────────────────────────────────────────────
-// Backend için beklenen endpoint sözleşmeleri yorum olarak verildi.
-// Kendi backend'inize bağlarken dönen veri şekli aynı kalmalı.
+// ── Public ──────────────────────────────────────────────────────
 
-export const register = (data: {
-  email: string; first_name: string; last_name: string; phone: string; password: string;
-}) => api.post("/auth/register", data);
+export const signup = (data: {
+  tenant_name: string;
+  slug: string;
+  owner_email: string;
+  owner_password: string;
+  owner_first_name: string;
+  owner_last_name: string;
+  owner_phone: string;
+}) => api.post("/signup", data);
+// → { tenant: {...}, user: {...}, access_token }
+
+// ── Tenant auth ─────────────────────────────────────────────────
+// NOT: Bu endpoint'ler tenant subdomain'inden çağrılmalıdır
+// (örn demo.localhost:8000). Subdomain'siz çağrı backend tarafından 400'le
+// reddedilir.
 
 export const login = (data: { email: string; password: string }) =>
-  api.post("/auth/login", data); // → { access_token: string }
+  api.post("/auth/login", data); // → { access_token }
 
-export const forgotPassword = (email: string) =>
-  api.post("/auth/forgot-password", { email });
+export const forgotPassword = (phone: string) =>
+  api.post("/auth/forgot-password", { phone });
 
-export const resetPassword = (data: { email: string; code: string; password: string }) =>
+export const resetPassword = (data: { phone: string; code: string; password: string }) =>
   api.post("/auth/reset-password", data);
 
 export const verify = (data: { channel: string; code: string }) =>
@@ -36,20 +64,11 @@ export const resendVerification = (data: { channel: string }) =>
   api.post("/auth/me/resend-verification", data);
 
 export const getMe = () => api.get("/auth/me");
-// → { id, email, first_name, last_name, phone, email_verified, phone_verified, is_admin, ... }
+// → { id, tenant_id, email, first_name, last_name, role: {id,name,is_system}, permissions: [...], ... }
 
 export const getLoginHistory = () => api.get("/auth/me/logins");
-// → [{ ip, user_agent, created_at }]
 
-export const updatePhone = (data: { phone: string }) =>
-  api.patch("/auth/me/phone", data);
-
-export const updateEmail = (data: { email: string }) =>
-  api.patch("/auth/me/email", data);
-
-// ── Notifications (örnek) ───────────────────────────────────────
+// ── Notifications (stub) ────────────────────────────────────────
 export const listNotifications = () => api.get("/notifications/");
-// → [{ id, title, message, type, read, created_at }]
-
 export const markRead = (id: number) => api.post(`/notifications/${id}/read`);
 export const markAllRead = () => api.post("/notifications/read-all");
