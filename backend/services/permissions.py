@@ -33,17 +33,22 @@ PERMISSIONS: list[PermissionDef] = [
     PermissionDef("roles.create", "Rol oluştur", "Yeni özel rol tanımla"),
     PermissionDef("roles.update", "Rol düzenle", "Rol adı veya permission'ları değiştir"),
     PermissionDef("roles.delete", "Rol sil", "Özel rol sil (sistem rolleri silinemez)"),
-    # Domain örnek —Contact
+    # Ürün ve Hizmet kataloğu
+    PermissionDef("products.read", "Ürün görüntüle", "Ürün/hizmet kataloğunu oku"),
+    PermissionDef("products.create", "Ürün oluştur", "Yeni ürün veya hizmet ekle"),
+    PermissionDef("products.update", "Ürün düzenle", "Mevcut ürün/hizmet kaydını güncelle"),
+    PermissionDef("products.delete", "Ürün sil", "Ürün/hizmet kaydını sil veya pasifleştir"),
+    # Domain örnek — Contact
     PermissionDef("contacts.read", "Contact görüntüle", "Müşteri/kişi kayıtlarını oku"),
     PermissionDef("contacts.create", "Contact oluştur", "Yeni kişi kaydı"),
     PermissionDef("contacts.update", "Contact düzenle", "Kişi kaydını güncelle"),
     PermissionDef("contacts.delete", "Contact sil", "Kişi kaydını sil"),
-    # Domain örnek —Deal
+    # Domain örnek — Deal
     PermissionDef("deals.read", "Fırsat görüntüle", "Satış fırsatlarını oku"),
     PermissionDef("deals.create", "Fırsat oluştur", "Yeni fırsat"),
     PermissionDef("deals.update", "Fırsat düzenle", "Fırsat bilgisi veya stage'i"),
     PermissionDef("deals.delete", "Fırsat sil", "Fırsat sil"),
-    # Domain örnek —Activity
+    # Domain örnek — Activity
     PermissionDef("activities.read", "Aktivite görüntüle", "Görüşme/email/not kayıtlarını oku"),
     PermissionDef("activities.create", "Aktivite oluştur", "Yeni aktivite kaydı"),
     PermissionDef("activities.update", "Aktivite düzenle", "Aktivite kaydını güncelle"),
@@ -72,6 +77,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         "settings.update",
     },
     "Member": {
+        "products.read",
+        "products.create",
+        "products.update",
         "contacts.read",
         "contacts.create",
         "contacts.update",

@@ -12,6 +12,7 @@ from routers import (
     platform_auth,
     signup,
     tenant_permissions,
+    tenant_products,
     tenant_roles,
     tenant_users,
 )
@@ -46,6 +47,7 @@ app.include_router(signup.router)
 app.include_router(tenant_users.router)
 app.include_router(tenant_roles.router)
 app.include_router(tenant_permissions.router)
+app.include_router(tenant_products.router)
 app.include_router(oauth_microsoft.router)
 
 

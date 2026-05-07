@@ -15,7 +15,7 @@ export default function SettingsPage() {
           { title: "API Anahtarları", desc: "Programatik erişim için anahtarlar" },
           { title: "Webhook'lar", desc: "Olay tabanlı entegrasyon noktaları" },
         ].map((s, i) => (
-          <div key={i} className="rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-sm">
+          <div key={i} className="glass-card p-5 text-card-foreground">
             <p className="text-sm font-bold text-foreground">{s.title}</p>
             <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
             <p className="mt-3 text-[11px] text-muted-foreground">Bu modülü starter'a göre uyarla.</p>

@@ -5,6 +5,7 @@ from .role import Role
 from .role_permission import RolePermission
 from .user import User
 from .verification import VerificationCode
+from .product import Product, ProductType
 
 __all__ = [
     "Tenant",
@@ -15,4 +16,6 @@ __all__ = [
     "RolePermission",
     "User",
     "VerificationCode",
+    "Product",
+    "ProductType",
 ]
