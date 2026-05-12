@@ -169,6 +169,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -203,6 +204,7 @@
     --sidebar-ring: oklch(0.708 0 0);
   }
   .dark {
+    color-scheme: dark;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
@@ -243,5 +245,20 @@
   }
   html {
     @apply font-sans antialiased;
+  }
+}
+
+@layer base {
+  /* Yerli form öğeleri — bg/text class'ı verilmeyenler de token'a uysun (utility'ler bunu ezer) */
+  input:where(:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"])),
+  select,
+  textarea {
+    background-color: var(--card);
+    color: var(--foreground);
+    border-color: var(--input);
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted-foreground);
   }
 }
