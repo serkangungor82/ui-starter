@@ -118,6 +118,39 @@ function LogoutIcon() {
 }
 
 
+type _HdrLink = { href: string; label: string };
+function HeaderTitle({ pathname, locale, isTr, links }: { pathname: string; locale: string; isTr: boolean; links: _HdrLink[] }) {
+  const sp = useSearchParams();
+  const subKey = sp?.get("sub");
+  const prefix = `/${locale}/dashboard`;
+  let title = "";
+  if (pathname && pathname.startsWith(prefix)) {
+    const after = pathname.slice(prefix.length).replace(/^\//, "").split("/").filter(Boolean);
+    if (after.length === 0) {
+      title = isTr ? "Kontrol Paneli" : "Dashboard";
+    } else {
+      const segment = after[0];
+      const link = links.find((l) => l.href === `${prefix}/${segment}`);
+      const base = link?.label ?? segment;
+      if (after.length === 1) {
+        const items = SUBMENUS[segment];
+        const sub = items?.find((it) => it.key === subKey);
+        const subLabel = sub ? (isTr ? sub.tr : sub.en) : "";
+        title = subLabel ? `${base} / ${subLabel}` : base;
+      } else {
+        const items = SUBMENUS[segment];
+        const sub = items?.find((it) => it.key === after[1]);
+        const subLabel = sub ? (isTr ? sub.tr : sub.en) : after[1];
+        const last = after[after.length - 1];
+        const tail = last === "new" ? (isTr ? "Yeni" : "New") : isTr ? "Detay" : "Detail";
+        title = `${base} / ${subLabel} / ${tail}`;
+      }
+    }
+  }
+  return <h1 className="truncate text-sm font-semibold text-foreground">{title}</h1>;
+}
+
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { locale } = useParams<{ locale: string }>();
   const pathname = usePathname();
@@ -191,7 +224,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </Suspense>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center justify-end gap-3 border-b border-border bg-card px-6">
+        <header className="flex h-14 items-center justify-between gap-3 border-b border-border bg-card px-6">
+          <Suspense fallback={<h1 className="truncate text-sm font-semibold text-foreground" />}>
+            <HeaderTitle pathname={pathname ?? ""} locale={locale} isTr={isTr} links={links} />
+          </Suspense>
+          <div className="flex items-center gap-3">
           {canAccessAdmin && (
             <Link
               href={`/${locale}/admin`}
@@ -216,6 +253,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <LogoutIcon />
           </button>
+          </div>
         </header>
 
         <main className="glass-mesh-bg flex flex-1 flex-col overflow-hidden bg-muted/30 p-6 min-h-0">
