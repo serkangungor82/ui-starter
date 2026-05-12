@@ -49,6 +49,27 @@ function LogoutIcon() {
 }
 
 
+type _HdrLink = { href: string; label: string };
+function HeaderTitle({ pathname, locale, isTr, links }: { pathname: string; locale: string; isTr: boolean; links: _HdrLink[] }) {
+  const root = `/${locale}/admin`;
+  let best: _HdrLink | null = null;
+  for (const l of links) {
+    if (pathname === l.href || pathname.startsWith(l.href + "/")) {
+      if (!best || l.href.length > best.href.length) best = l;
+    }
+  }
+  let title = best ? best.label : isTr ? "Yönetim" : "Admin";
+  if (best && best.href !== root && pathname.length > best.href.length) {
+    const tail = pathname.slice(best.href.length).replace(/^\//, "").split("/").filter(Boolean);
+    if (tail.length) {
+      const last = tail[tail.length - 1];
+      title = `${best.label} / ${last === "new" ? (isTr ? "Yeni" : "New") : isTr ? "Detay" : "Detail"}`;
+    }
+  }
+  return <h1 className="truncate text-sm font-semibold text-foreground">{title}</h1>;
+}
+
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { locale } = useParams<{ locale: string }>();
   const pathname = usePathname();
@@ -134,7 +155,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-border bg-card px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-6">
+          <HeaderTitle pathname={pathname ?? ""} locale={locale} isTr={isTr} links={links} />
+          <div className="flex items-center gap-3">
           <Link
             href={`/${locale}/dashboard`}
             className="flex items-center gap-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-500/20 dark:text-indigo-300"
@@ -152,6 +175,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <LogoutIcon />
           </button>
+          </div>
         </header>
         <main className="glass-mesh-bg flex-1 overflow-y-auto bg-muted/30 p-8">
           {children}
